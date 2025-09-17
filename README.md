@@ -10,8 +10,9 @@ Qufy is a Streamlit web application that allows you to upload PDF documents and 
 This application features a persistent, multi-chat interface, ensuring your conversations are saved locally and can be resumed at any time.
 
 ## 🚀 Demo
+![930851c8-a5c5-4c40-8f99-f8e1c388460c](https://github.com/user-attachments/assets/6707098d-d130-477b-bd11-7e0826a66340)
 
-_(**Note**: It is highly recommended to replace the image above with a GIF showcasing the app's workflow: uploading a PDF, asking a question, switching between chats, and deleting a chat.)_
+![ade4cb97-bdb8-447f-b279-6fbe0498d3bf](https://github.com/user-attachments/assets/71bcce25-6078-4351-ad8d-cfd1d1d6e9a1)
 
 ---
 
