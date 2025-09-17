@@ -3,7 +3,6 @@
 [![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-red.svg)](https://streamlit.io)
 [![LangChain](https://img.shields.io/badge/LangChain-0.2+-green.svg)](https://www.langchain.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Qufy is a Streamlit web application that allows you to upload PDF documents and have interactive conversations about their content. Powered by local language models via Ollama and LangChain, it turns any PDF into a knowledgeable chatbot.
 
