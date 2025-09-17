@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  # Nama service kita, bisa apa saja
+  qufy:
+    # Perintahkan Docker untuk membangun image dari Dockerfile di direktori saat ini
+    build: .
+    # Beri nama yang bagus untuk container kita
+    container_name: qufy_app
+    # Hubungkan port 8501 di komputer kita ke port 8501 di dalam container
+    ports:
+      - "8501:8501"
+    # Hubungkan App dengan container untuk development
+    volumes:
+      - .:/app
+    # Ini adalah 'magic' yang memungkinkan container mengakses 'host.docker.internal'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
