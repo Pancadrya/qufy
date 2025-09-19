@@ -4,10 +4,10 @@ from . import auth
 from . import database
 
 def display_login_register():
-    st.title("Selamat Datang di Qufy 🤖")
-    st.info("Silakan login untuk melanjutkan atau buat akun baru jika Anda belum terdaftar.")
+    st.title("Welcome to Qufy 🤖")
+    st.info("Please log in to continue, or create a new account if you are not registered yet.")
     
-    login_tab, register_tab = st.tabs(["Login", "Registrasi"])
+    login_tab, register_tab = st.tabs(["Login", "Register"])
 
     with login_tab:
         with st.form("login_form"):
@@ -19,17 +19,17 @@ def display_login_register():
                 if auth.login_user(db, username, password):
                     st.rerun()
                 else:
-                    st.error("Username atau password salah.")
+                    st.error("Incorrect username or password.")
                 db.close()
 
     with register_tab:
         with st.form("register_form"):
             new_username = st.text_input("Username")
             new_password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Registrasi")
+            submitted = st.form_submit_button("Register")
             if submitted:
                 if not new_username or not new_password:
-                    st.error("Username dan password tidak boleh kosong.")
+                    st.error("Username and password cannot be empty.")
                 else:
                     db = database.SessionLocal()
                     success, message = auth.register_user(db, new_username, new_password)
@@ -41,9 +41,9 @@ def display_login_register():
 
 def display_sidebar(user_id):
     with st.sidebar:
-        st.header(f"Selamat Datang, {st.session_state['username']}!")
+        st.header(f"Welcome, {st.session_state['username']}!")
         
-        if st.button("➕ Buat Chat Baru"):
+        if st.button("➕ New Chat"):
             st.session_state.active_chat_id = None
             st.rerun()
 
@@ -54,7 +54,7 @@ def display_sidebar(user_id):
         db.close()
         
         if not chat_sessions:
-            st.caption("Anda belum memiliki riwayat chat. Mulai dengan membuat chat baru!")
+            st.caption("You don’t have any chat history yet. Start by creating a new chat!")
         else:
             for chat in chat_sessions:
                 col1, col2 = st.columns([0.8, 0.2])
@@ -66,7 +66,7 @@ def display_sidebar(user_id):
                         st.session_state.active_chat_id = chat.id
                         st.rerun()
                 with col2:
-                    if st.button("🗑️", key=f"del_{chat.id}", help="Hapus chat ini"):
+                    if st.button("🗑️", key=f"del_{chat.id}", help="Delete this chat"):
                         db = database.SessionLocal()
                         database.delete_chat(db, chat.id)
                         db.close()

@@ -29,7 +29,7 @@ class Message(Base):
     __tablename__ = 'messages'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     chat_id = Column(UUID(as_uuid=True), ForeignKey('chats.id'), nullable=False)
-    role = Column(String, nullable=False) # 'user' or 'assistant'
+    role = Column(String, nullable=False)  # 'user' or 'assistant'
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     chat = relationship("Chat", back_populates="messages")
@@ -39,5 +39,5 @@ class DocumentChunk(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     chat_id = Column(UUID(as_uuid=True), ForeignKey('chats.id'), nullable=False)
     chunk_text = Column(Text, nullable=False)
-    embedding = Column(Vector(768), nullable=False) # nomic-embed-text has 768 dimensions
+    embedding = Column(Vector(768), nullable=False)  # nomic-embed-text has 768 dimensions
     chat = relationship("Chat", back_populates="chunks")

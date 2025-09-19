@@ -1,4 +1,4 @@
-# init_db.py (Versi Perbaikan)
+# init_db.py (Improved Version)
 import os
 from sqlalchemy import create_engine, text
 from src.models import Base
@@ -10,32 +10,32 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 def initialize_database():
-    # Coba hubungkan ke database, beri waktu jika belum siap
+    # Try connecting to the database, allow some time if it's not ready yet
     retries = 5
     while retries > 0:
         try:
             engine = create_engine(DATABASE_URL)
             with engine.connect() as connection:
-                print("Koneksi database berhasil!")
+                print("Database connection successful!")
                 
-                # Gunakan transaksi eksplisit untuk membuat ekstensi
+                # Use an explicit transaction to create the extension
                 trans = connection.begin()
-                print("Mencoba membuat ekstensi 'vector'...")
+                print("Attempting to create 'vector' extension...")
                 connection.execute(text('CREATE EXTENSION IF NOT EXISTS vector'))
                 trans.commit()
-                print("Ekstensi 'vector' berhasil dibuat atau sudah ada.")
+                print("'vector' extension created successfully or already exists.")
                 
-                # Sekarang buat semua tabel
-                print("Membuat semua tabel dari models...")
+                # Now create all tables
+                print("Creating all tables from models...")
                 Base.metadata.create_all(engine)
-                print("Semua tabel berhasil dibuat.")
+                print("All tables created successfully.")
             
-            break # Keluar dari loop jika berhasil
+            break  # Exit the loop if successful
 
         except Exception as e:
-            print(f"Gagal terhubung ke database: {e}")
+            print(f"Failed to connect to the database: {e}")
             retries -= 1
-            print(f"Mencoba lagi dalam 5 detik... ({retries} percobaan tersisa)")
+            print(f"Retrying in 5 seconds... ({retries} attempts left)")
             time.sleep(5)
 
 if __name__ == "__main__":

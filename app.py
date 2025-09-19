@@ -6,12 +6,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OllamaEmbeddings
 from langchain.llms import Ollama
 
-# Impor modul dari folder src
+# Import modules from src folder
 from src import ui, auth, database
 from src.models import Base
 
-# --- Konfigurasi Awal ---
-st.set_page_config(page_title="Qufy | Questioning your fyle, hehe", page_icon="🤖", layout="wide")
+# --- Initial Configuration ---
+st.set_page_config(page_title="Qufy | Questioning your file, hehe", page_icon="🤖", layout="wide")
 
 OLLAMA_EMBED_MODEL = "nomic-embed-text"
 OLLAMA_LLM = "granite3.3:2b"
@@ -26,40 +26,38 @@ def get_embeddings_client():
 def get_llm_client():
     return Ollama(model=OLLAMA_LLM, base_url=OLLAMA_BASE_URL)
 
-# --- Alur Aplikasi Utama ---
+# --- Main Application Flow ---
 def main():
-    # Periksa apakah pengguna sudah login
+    # Check if the user is already logged in
     if not st.session_state.get('logged_in'):
         ui.display_login_register()
     else:
-        # Jika sudah login, tampilkan UI utama
+        # If logged in, show the main UI
         user_id = st.session_state.get('user_id')
         ui.display_sidebar(user_id)
         
-        st.title("🤖 Qufy: Chat dengan Dokumen Anda")
+        st.title("🤖 Qufy: Chat with Your Documents")
 
-        # Tentukan halaman mana yang akan ditampilkan (chat baru atau chat aktif)
+        # Determine which page to display (new chat or active chat)
         if st.session_state.get('active_chat_id') is None:
             display_new_chat_page(user_id)
         else:
             display_active_chat_window()
 
-# app.py
-
-# Ganti seluruh fungsi display_new_chat_page dengan ini:
+# Replace the entire display_new_chat_page function with this:
 def display_new_chat_page(user_id):
-    """Menampilkan halaman untuk mengunggah PDF dan membuat chat baru."""
-    st.info("Silakan unggah dokumen PDF untuk memulai sesi chat baru.")
-    uploaded_file = st.file_uploader("Pilih file PDF", type="pdf", label_visibility="collapsed")
+    """Display the page for uploading a PDF and creating a new chat."""
+    st.info("Please upload a PDF document to start a new chat session.")
+    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", label_visibility="collapsed")
 
     if uploaded_file:
-        if st.button(f"Proses '{uploaded_file.name}'"):
-            with st.spinner("Menganalisis dokumen... Ini bisa memakan waktu beberapa menit."):
+        if st.button(f"Process '{uploaded_file.name}'"):
+            with st.spinner("Analyzing the document... This may take a few minutes."):
                 
-                # --- Awal blok interaksi database ---
+                # --- Begin database interaction block ---
                 db = database.SessionLocal()
                 try:
-                    # Proses PDF
+                    # Process the PDF
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
                         tmpfile.write(uploaded_file.getvalue())
                         loader = PyPDFLoader(tmpfile.name)
@@ -69,7 +67,7 @@ def display_new_chat_page(user_id):
                     chunks = text_splitter.split_documents(docs)
                     chunk_texts = [chunk.page_content for chunk in chunks]
                     
-                    # Buat embeddings
+                    # Create embeddings
                     embeddings_client = get_embeddings_client()
                     chunk_embeddings = embeddings_client.embed_documents(chunk_texts)
                     
@@ -78,29 +76,29 @@ def display_new_chat_page(user_id):
                         for text, embedding in zip(chunk_texts, chunk_embeddings)
                     ]
                     
-                    # Simpan ke database
+                    # Save to database
                     new_chat = database.add_new_chat(db, user_id, uploaded_file.name)
-                    # Ambil ID SEKARANG, selagi sesi masih terbuka
+                    # Capture the ID now while the session is still open
                     new_chat_id = new_chat.id
                     database.add_document_chunks(db, new_chat_id, chunks_with_embeddings)
 
                 finally:
-                    # Pastikan sesi selalu ditutup, bahkan jika ada error
+                    # Ensure session is always closed, even if an error occurs
                     db.close()
-                # --- Akhir blok interaksi database ---
+                # --- End database interaction block ---
 
-                # Gunakan ID yang sudah kita simpan dengan aman
+                # Use the ID we safely stored
                 st.session_state.active_chat_id = new_chat_id
-                st.success("Dokumen berhasil diproses! Anda bisa mulai bertanya.")
+                st.success("Document successfully processed! You can now start asking questions.")
                 st.rerun()
 
 def display_active_chat_window():
-    """Menampilkan jendela chat untuk sesi yang sedang aktif."""
+    """Display the chat window for the active session."""
     chat_id = st.session_state.active_chat_id
     db = database.SessionLocal()
 
     chat = db.query(database.Chat).filter_by(id=chat_id).first()
-    if chat and chat.file_name:  # pastikan kolom filename ada
+    if chat and chat.file_name:  # make sure filename column exists
         st.markdown(
             f"""
             <div style="
@@ -116,55 +114,54 @@ def display_active_chat_window():
                     margin: 0;
                     font-size: 1.1em;
                 ">
-                    Anda bertanya tentang: <strong>{chat.file_name}</strong>
+                    You are asking about: <strong>{chat.file_name}</strong>
                 </p>
             </div>
             """,
             unsafe_allow_html=True
         )
     
-    # Ambil riwayat pesan dari DB
+    # Retrieve message history from DB
     messages = database.get_messages_for_chat(db, chat_id)
     for msg in messages:
         with st.chat_message(msg.role):
             st.markdown(msg.content)
 
-    # Terima input pengguna
-    if prompt := st.chat_input("Tanyakan sesuatu tentang dokumen..."):
-        # Tambahkan pesan user ke UI dan DB
+    # Receive user input
+    if prompt := st.chat_input("Ask something about the document..."):
+        # Add the user message to the UI and DB
         with st.chat_message("user"):
             st.markdown(prompt)
         database.add_message(db, chat_id, "user", prompt)
 
-        # Bubble asisten dengan placeholder
+        # Assistant bubble with placeholder
         with st.chat_message("assistant"):
             placeholder = st.empty()
             with placeholder.container():
-                with st.spinner("AI sedang berpikir..."):
+                with st.spinner("AI is thinking..."):
                     embeddings_client = get_embeddings_client()
                     llm = get_llm_client()
 
-                    # 1. Buat embedding untuk pertanyaan user
+                    # 1. Create embedding for the user’s question
                     query_embedding = embeddings_client.embed_query(prompt)
 
-                    # 2. Cari potongan teks relevan di DB
+                    # 2. Find relevant text chunks in DB
                     similar_chunks = database.find_similar_chunks(db, chat_id, query_embedding)
                     context = "\n\n".join([chunk.chunk_text for chunk in similar_chunks])
 
-                    # 3. Gabungkan konteks + pertanyaan
+                    # 3. Combine context + question
                     full_prompt = f"Based on this context:\n\n{context}\n\nAnswer this question: {prompt}"
 
-                    # 4. Minta jawaban ke LLM
+                    # 4. Get response from LLM
                     response = llm.invoke(full_prompt)
 
-            # Setelah spinner selesai, ganti dengan jawaban final
+            # Replace placeholder with final response
             placeholder.markdown(response)
 
-            # Simpan jawaban ke DB
+            # Save assistant’s response to DB
             database.add_message(db, chat_id, "assistant", response)
     
     db.close()
-
 
 
 if __name__ == "__main__":

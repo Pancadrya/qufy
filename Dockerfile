@@ -1,22 +1,20 @@
-# Dockerfile
-
-# Gunakan base image Python versi 3.11
+# Use Python version 3.11 as the base image
 FROM python:3.11-slim
 
-# Tetapkan direktori kerja di dalam container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Salin file requirements.txt terlebih dahulu untuk caching
+# Copy requirements.txt first for caching
 COPY requirements.txt .
 
-# Install semua dependensi
+# Install all dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Salin semua file dari proyek ke dalam direktori kerja di container
+# Copy all project files into the working directory inside the container
 COPY . .
 
-# Ekspos port yang digunakan oleh Streamlit
+# Expose the port used by Streamlit
 EXPOSE 8501
 
-# Perintah default untuk menjalankan aplikasi saat container dimulai
+# Default command to run the application when the container starts
 CMD ["streamlit", "run", "app.py"]

@@ -59,8 +59,8 @@ def add_document_chunks(db, chat_id, chunks_with_embeddings):
     db.commit()
 
 def find_similar_chunks(db, chat_id, query_embedding, k=4):
-    # Gunakan operator <-> dari pgvector untuk L2 distance
-    # Pastikan chat_id juga difilter untuk isolasi data
+    # Use the <-> operator from pgvector for L2 distance
+    # Ensure chat_id is also filtered for data isolation
     results = db.query(DocumentChunk).filter(DocumentChunk.chat_id == chat_id).order_by(
         DocumentChunk.embedding.l2_distance(query_embedding)
     ).limit(k).all()
