@@ -11,7 +11,9 @@ This application features a persistent, multi-chat interface, ensuring your conv
 
 ## 🚀 Demo
 
-![2025-09-1921-34-03-ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/ec4d3603-9e32-4629-b1a2-89b927429214)
+![930851c8-a5c5-4c40-8f99-f8e1c388460c](https://github.com/user-attachments/assets/6707098d-d130-477b-bd11-7e0826a66340)
+
+![ade4cb97-bdb8-447f-b279-6fbe0498d3bf](https://github.com/user-attachments/assets/71bcce25-6078-4351-ad8d-cfd1d1d6e9a1)
 
 ---
 
