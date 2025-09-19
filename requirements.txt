@@ -1,5 +1,13 @@
-streamlit>=1.33.0
+# requirements.txt
+streamlit
 langchain
-langchain_community
+langchain-community
 pypdf
 faiss-cpu
+ollama
+sqlalchemy
+psycopg2-binary
+pgvector
+bcrypt
+python-dotenv
+streamlit-javascript

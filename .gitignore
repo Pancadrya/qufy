@@ -1,2 +1,10 @@
-# User-generated data and sensitive information
-chat_sessions/
+# .gitignore
+.env
+__pycache__/
+*.pyc
+.DS_Store
+/chat_sessions/
+/ollama_data/
+/postgres_data/
+config.yaml
+db_setup.py

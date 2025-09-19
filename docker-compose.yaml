@@ -1,18 +1,34 @@
+# docker-compose.yml
 version: "3.8"
 
 services:
-  # Nama service kita, bisa apa saja
-  qufy:
-    # Perintahkan Docker untuk membangun image dari Dockerfile di direktori saat ini
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  app:
     build: .
-    # Beri nama yang bagus untuk container kita
-    container_name: qufy_app
-    # Hubungkan port 8501 di komputer kita ke port 8501 di dalam container
+    container_name: qufy_app_2
     ports:
       - "8501:8501"
-    # Hubungkan App dengan container untuk development
     volumes:
       - .:/app
-    # Ini adalah 'magic' yang memungkinkan container mengakses 'host.docker.internal'
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    environment:
+      - OLLAMA_HOST=host.docker.internal
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
