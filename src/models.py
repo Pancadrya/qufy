@@ -31,6 +31,7 @@ class Message(Base):
     chat_id = Column(UUID(as_uuid=True), ForeignKey('chats.id'), nullable=False)
     role = Column(String, nullable=False) # 'user' or 'assistant'
     content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     chat = relationship("Chat", back_populates="messages")
 
 class DocumentChunk(Base):

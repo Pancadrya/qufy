@@ -42,7 +42,7 @@ def delete_chat(db, chat_id):
 
 # --- Message Management ---
 def get_messages_for_chat(db, chat_id):
-    return db.query(Message).filter(Message.chat_id == chat_id).order_by(Message.id).all()
+    return db.query(Message).filter(Message.chat_id == chat_id).order_by(Message.created_at).all()
 
 def add_message(db, chat_id, role, content):
     new_message = Message(chat_id=chat_id, role=role, content=content)

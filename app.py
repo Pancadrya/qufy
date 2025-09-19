@@ -11,7 +11,7 @@ from src import ui, auth, database
 from src.models import Base
 
 # --- Konfigurasi Awal ---
-st.set_page_config(page_title="Qufy", page_icon="🤖", layout="wide")
+st.set_page_config(page_title="Qufy | Questioning your fyle, hehe", page_icon="🤖", layout="wide")
 
 OLLAMA_EMBED_MODEL = "nomic-embed-text"
 OLLAMA_LLM = "granite3.3:2b"
@@ -98,8 +98,32 @@ def display_active_chat_window():
     """Menampilkan jendela chat untuk sesi yang sedang aktif."""
     chat_id = st.session_state.active_chat_id
     db = database.SessionLocal()
+
+    chat = db.query(database.Chat).filter_by(id=chat_id).first()
+    if chat and chat.file_name:  # pastikan kolom filename ada
+        st.markdown(
+            f"""
+            <div style="
+                padding: 12px;
+                background-color: #1a1c23;
+                border-radius: 10px; 
+                border-left: 6px solid #ffbd45;
+                margin-bottom: 20px;
+            ">
+                <p style="
+                    color: #ffffff;  
+                    font-family: 'Segoe UI', 'Roboto', sans-serif; 
+                    margin: 0;
+                    font-size: 1.1em;
+                ">
+                    Anda bertanya tentang: <strong>{chat.file_name}</strong>
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
     
-    # Ambil riwayat pesan
+    # Ambil riwayat pesan dari DB
     messages = database.get_messages_for_chat(db, chat_id)
     for msg in messages:
         with st.chat_message(msg.role):
@@ -107,35 +131,40 @@ def display_active_chat_window():
 
     # Terima input pengguna
     if prompt := st.chat_input("Tanyakan sesuatu tentang dokumen..."):
-        # Tambahkan pesan pengguna ke UI dan DB
+        # Tambahkan pesan user ke UI dan DB
         with st.chat_message("user"):
             st.markdown(prompt)
         database.add_message(db, chat_id, "user", prompt)
 
-        # Logika RAG (Retrieval-Augmented Generation)
+        # Bubble asisten dengan placeholder
         with st.chat_message("assistant"):
-            with st.spinner("AI sedang berpikir..."):
-                embeddings_client = get_embeddings_client()
-                llm = get_llm_client()
+            placeholder = st.empty()
+            with placeholder.container():
+                with st.spinner("AI sedang berpikir..."):
+                    embeddings_client = get_embeddings_client()
+                    llm = get_llm_client()
 
-                # 1. Buat embedding untuk pertanyaan pengguna
-                query_embedding = embeddings_client.embed_query(prompt)
+                    # 1. Buat embedding untuk pertanyaan user
+                    query_embedding = embeddings_client.embed_query(prompt)
 
-                # 2. Cari potongan teks yang relevan di DB
-                similar_chunks = database.find_similar_chunks(db, chat_id, query_embedding)
-                context = "\n\n".join([chunk.chunk_text for chunk in similar_chunks])
+                    # 2. Cari potongan teks relevan di DB
+                    similar_chunks = database.find_similar_chunks(db, chat_id, query_embedding)
+                    context = "\n\n".join([chunk.chunk_text for chunk in similar_chunks])
 
-                # 3. Buat prompt gabungan (konteks + pertanyaan)
-                full_prompt = f"Berdasarkan konteks berikut:\n\n{context}\n\nJawab pertanyaan ini: {prompt}"
+                    # 3. Gabungkan konteks + pertanyaan
+                    full_prompt = f"Based on this context:\n\n{context}\n\nAnswer this question: {prompt}"
 
-                # 4. Kirim ke LLM untuk mendapatkan jawaban
-                response = llm.invoke(full_prompt)
-                
-                st.markdown(response)
-                # Tambahkan respons AI ke DB
-                database.add_message(db, chat_id, "assistant", response)
+                    # 4. Minta jawaban ke LLM
+                    response = llm.invoke(full_prompt)
+
+            # Setelah spinner selesai, ganti dengan jawaban final
+            placeholder.markdown(response)
+
+            # Simpan jawaban ke DB
+            database.add_message(db, chat_id, "assistant", response)
     
     db.close()
+
 
 
 if __name__ == "__main__":
