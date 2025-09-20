@@ -1,5 +1,10 @@
 # Qufy 🤖💬 - Chat with Your Documents
 
+[![Python Version](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-red.svg)](https://streamlit.io)
+[![LangChain](https://img.shields.io/badge/LangChain-0.2+-green.svg)](https://www.langchain.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+
 ---
 
 Qufy is an interactive web application that allows you to "talk" to your PDF documents. Upload a file, and start asking questions about its content. The entire Q&A process is powered by a Large Language Model (LLM) running 100% in your local environment via Ollama, ensuring privacy and complete control over your data.
@@ -72,7 +77,7 @@ Ensure you have the following installed on your system:
     Make sure the Ollama application is running in the background. Then, pull the required model:
 
     ```bash
-    ollama pull ibm-granite-code:3b
+    ollama pull ibm-granite-code:2b
     ```
 
 4.  **Configure the Environment**
