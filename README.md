@@ -21,7 +21,7 @@ Qufy is an interactive web application that allows you to "talk" to your PDF doc
 
 Check out a quick demo of Qufy in action!
 
-![ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/207aee12-216-4fe9-a32a-cb32b2afe73a)
+![ezgif com-video-to-gif-converter](https://github.com/user-attachments/assets/207aee12-3b16-4fe9-a32a-cb32b2afe73a)
 
 ---
 
